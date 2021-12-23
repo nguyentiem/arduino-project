@@ -1,0 +1,204 @@
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+#define LED_PIN        6 // On Trinket or Gemma, suggest changing this to 1
+#define NUM_LEDS 30 // Popular NeoPixel ring size
+
+Adafruit_NeoPixel pixels(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+#define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
+int r=152;
+int g=0;
+int b=10;
+
+ 
+int leds[3][NUM_LEDS];
+int led_con[3][3][7];  // mode -R,G,B -led  
+
+int s=0;
+ int tinh =0; 
+ int led =0; 
+ int preled =0; 
+ void hienthitinh(int i){
+   pixels.setPixelColor(i, pixels.Color( led_con[0][0][6], led_con[0][1][6],led_con[0][2][6]));
+   pixels.show(); 
+  }
+ void hienthi(int i){
+  if(i>=5){
+      pixels.setPixelColor(i, pixels.Color( led_con[0][0][5], led_con[0][1][5],led_con[0][2][5] ));
+      pixels.setPixelColor(i-1, pixels.Color( led_con[0][0][4], led_con[0][1][4],led_con[0][2][4]));
+      pixels.setPixelColor(i-2, pixels.Color( led_con[0][0][3], led_con[0][1][3],led_con[0][2][3]));
+      pixels.setPixelColor(i-3, pixels.Color( led_con[0][0][2], led_con[0][1][2],led_con[0][2][2]));
+      pixels.setPixelColor(i-4, pixels.Color( led_con[0][0][1], led_con[0][1][1],led_con[0][2][1]));
+      pixels.setPixelColor(i-5, pixels.Color( led_con[0][0][0], led_con[0][1][0],led_con[0][2][0]));
+      if(i>5){
+        for(int j = i-5 ;j>=0; j-- ){
+          pixels.setPixelColor(j, pixels.Color( led_con[0][0][0], led_con[0][1][0],led_con[0][2][0]));
+          }
+        }
+      pixels.show();
+    }  
+  }
+ void def(){
+      pixels.clear();
+      pixels.setPixelColor(0, pixels.Color(100, 30, 30));
+      pixels.setPixelColor(1, pixels.Color(60, 10, 10));
+      pixels.setPixelColor(2, pixels.Color(50,0 , 10));
+      pixels.setPixelColor(3, pixels.Color(30, 0, 10));
+      pixels.setPixelColor(4, pixels.Color(0, 10, 10));
+      pixels.setPixelColor(5, pixels.Color(0, 0, 5));
+      pixels.setPixelColor(6, pixels.Color(0, 100, 0));
+      pixels.show();
+  }
+void setup() {
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+
+       pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
+       for(int j=0 ;j<=NUM_LEDS;j++){
+         for(int i =NUM_LEDS ; i>=j; i--){
+          if(i<NUM_LEDS){
+           pixels.setPixelColor(i+1, pixels.Color(0, 0, 0));
+           pixels.show();
+          }
+           pixels.setPixelColor(i, pixels.Color(50, 0, 30));
+             pixels.show(); 
+            delay(10); 
+            
+          }
+       }
+      for(int j=NUM_LEDS ;j>=0;j--){
+         for(int i =j ; i<=NUM_LEDS; i++){
+          if(i>j){
+             pixels.setPixelColor(i-1, pixels.Color(0, 0, 0));
+             pixels.show(); 
+             }
+           pixels.setPixelColor(i, pixels.Color(50, 0, 30));
+             pixels.show(); 
+            delay(10);
+             
+          }
+       }
+       def(); 
+       led_con[0][0][0] = 100; 
+       led_con[0][1][0] = 30; 
+       led_con[0][2][0] = 30; 
+
+       led_con[0][0][1] = 60; 
+       led_con[0][1][1] = 10; 
+       led_con[0][2][1] = 10; 
+      
+       led_con[0][0][2] = 50; 
+       led_con[0][1][2] = 0; 
+       led_con[0][2][2] = 10;
+
+       led_con[0][0][3] = 30; 
+       led_con[0][1][3] = 0; 
+       led_con[0][2][3] = 10; 
+
+       led_con[0][0][4] = 100; 
+       led_con[0][1][4] = 10; 
+       led_con[0][2][4] = 100; 
+      
+       led_con[0][0][5] = 0; 
+       led_con[0][1][5] = 0; 
+       led_con[0][2][5] = 100;
+
+       led_con[0][0][6] = 0; 
+       led_con[0][1][6] = 100; 
+       led_con[0][2][6] = 0;
+       Serial.begin(9600);
+       pinMode(A0,INPUT);
+
+   //1200-900-700-500-400-300-200-100-0; 
+}
+
+unsigned long time1 =0;
+unsigned long time2 =0;
+
+void loop() {
+   s=analogRead(A0);
+   s-=500;
+   s= s>100?s:0; 
+   s= s<1200?s:1200;  
+   Serial.println(s); 
+    if((s>900)&&(s<=1200))
+  {
+    
+    led = map(s, 901, 1200, 27, 29);
+  }
+  else if((s>800)&&(s<=900))
+  {
+   led = map(s, 801, 900, 25, 26);
+  
+  }
+  else if((s>700)&&(s<=800))
+   {
+    led = map(s, 701, 800, 21, 24);
+   }
+   else if((s>500)&&(s<=700))
+  {
+    led = map(s, 501, 700, 15, 20);
+  }
+
+    else if((s>300)&&(s<=500))
+   {
+      led = map(s, 301, 500, 10, 14);
+   }
+   else if((s>200)&&(s<=300))
+   {
+   led = map(s, 201, 300, 8, 9);
+   }
+  else if((s>100)&&(s<=200))
+   {
+  led = map(s, 101, 200, 6, 7);
+    
+   }
+   else if((s<=100))
+   {
+     led =5; 
+   }
+    if(preled>led){
+           for(int i=preled; i>=led; i--){
+           pixels.setPixelColor(i, pixels.Color(0,0,0));
+        }
+        preled =led; 
+      }
+   //if(led > preled){
+     hienthi(led);
+     preled =led ; 
+     if(led+1>tinh){
+        tinh = led +1; 
+          hienthitinh(tinh);
+      }
+  //  }
+ 
+//   if ( (unsigned long) (millis() - time2) > 15)
+//    { 
+//      if(preled>led){
+//           for(int i=preled; i>=led; i--){
+//           pixels.setPixelColor(i, pixels.Color(0,0,0));
+//        }
+//      }
+//      
+//        preled =led; 
+//        hienthi(led);
+//     if(led+1 >tinh ){
+//          tinh = led +1; 
+//          hienthitinh(tinh);
+//      }
+//   time2 = millis();
+// }
+    
+ if ((unsigned long) (millis() - time1) > 60)
+    {
+        pixels.setPixelColor(tinh, pixels.Color(0,0,0));
+        pixels.show();
+        tinh -=1;  
+        pixels.setPixelColor(tinh, pixels.Color( led_con[0][0][6], led_con[0][1][6],led_con[0][2][6]));
+        time1 = millis();
+    }
+}
